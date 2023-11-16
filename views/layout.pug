@@ -1,0 +1,69 @@
+
+html
+  head
+    meta(charset='UTF-8')
+    meta(http-equiv='X-UA-Compatible' content='IE=edge')
+
+    // Ваши теги head здесь
+    link(rel='stylesheet' href='https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css')
+    link(rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" integrity="sha512-z3gLpd7yknf1YoNbCzqRKc4qyor8gaKU1qmn+CShxbuBusANI9QpRohGBreCFkKxLhei6S9CQXFEbbKuqLg0DA==" crossorigin="anonymous" referrerpolicy="no-referrer")
+    title=title+' Google-parser'
+  body
+    nav.navbar.navbar-expand-md.navbar-dark.bg-dark
+      a.navbar-brand(href='#') Google Parser
+      button.navbar-toggler(type='button' data-toggle='collapse' data-target='#navbarNav' aria-controls='navbarNav' aria-expanded='false' aria-label='Toggle navigation')
+        span.navbar-toggler-icon
+      div.collapse.navbar-collapse#navbarNav
+        ul.navbar-nav
+          li.nav-item
+            a.nav-link(class=(currentPage === '/' ? 'active' : '') href='/') Accounts
+          li.nav-item
+            a.nav-link(class=(currentPage === '/countries/' ? 'active' : '') href='/countries/') Countries
+    div.container
+      block content
+
+    //- script(src='https://code.jquery.com/jquery-3.6.4.min.js' integrity='sha256-oP6HI/tZ1a9JJl3h83L4BkOiK1XkGxjTUEfjIEmHu5A=' crossorigin='anonymous')
+    //- script(src='https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.10.2/umd/popper.min.js' integrity='sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm' crossorigin='anonymous')
+    script(src='https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js')
+    script.
+      document.addEventListener('DOMContentLoaded', function () {
+
+        const modals = document.querySelectorAll('.modal');
+
+
+        modals.forEach(function (modal) {
+          modal.addEventListener('show.bs.modal', function (event) {
+            const button = event.relatedTarget;
+            const curr = '#{currentPage}';
+            const jsonString = button.getAttribute('data-bs-json');
+
+            if(jsonString){
+              const jsonData = JSON.parse(jsonString);
+
+              const form = modal.querySelector('form');
+              for (const key in jsonData) {
+                if (Object.hasOwnProperty.call(jsonData, key)) {
+                  const input = form.querySelector(`[name="${key}"]`);
+
+                  if (input) {
+                    input.value = jsonData[key];
+                  }
+                  if(key=="id"){
+                    form.action=`${curr}${jsonData[key]}`
+                  }
+                }
+              }
+            }
+            else{
+              const value = button.getAttribute('data-bs-value');
+              if (!value)return;
+                const a = modal.querySelector('a#deleteButton')
+                if (a){
+                  a.href=`${curr}${value}/delete`
+                  
+                }
+            }
+            
+          });
+        });
+      });

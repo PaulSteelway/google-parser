@@ -1,0 +1,19 @@
+block content
+  .modal.fade#addCountryModal(tabindex="-1" role="dialog" aria-labelledby="addCountryModalLabel" aria-hidden="true")
+    .modal-dialog(role="document")
+      .modal-content
+        .modal-header
+          h5.modal-title#addCountryModalLabel Add country
+          button.btn-close(type="button" data-bs-dismiss="modal" aria-label="Close")
+        .modal-body
+          form(id="addCountryForm" action="/countries" method="POST")
+            .form-group
+              label(for="name") Country name
+              input.form-control(type="text" id="name" name="name", required)
+            .modal-footer
+
+                button.btn.btn-secondary(type="button" data-bs-dismiss="modal")
+                  i(class="fas fa-cancel")
+                button.btn.btn-primary(type="submit")
+                  i(class="fas fa-save")
+        

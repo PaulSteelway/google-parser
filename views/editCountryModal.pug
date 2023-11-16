@@ -1,0 +1,26 @@
+block content
+  .modal.fade#editCountryModal(tabindex="-1" role="dialog" aria-labelledby="editCountryModalLabel" aria-hidden="true")
+    .modal-dialog(role="document")
+      .modal-content
+        .modal-header
+          h5.modal-title#editCountryModalLabel Edit country
+          button.btn-close(type="button" data-bs-dismiss="modal" aria-label="Close")
+        .modal-body
+          form(id="editCountryForm" action="/countries/" method="POST")
+            input(id="dataId" name="id" type="hidden")
+            .form-group
+              label(for="editCountryName") Country name
+              input.form-control(type="text" id="editCountryName" name="name", required)
+            .form-group
+              label(for="editCountryKeywords") Keywords
+              input.form-control(type="text" id="editCountryKeywords" name="keywords" pattern=".*[,].*" title="String must contain at least one comma")
+            .form-group
+              label(for="editCountryStoplink") Stop link
+              input.form-control(type="text" id="editCountryStoplink" name="stop_words",pattern=".*[,].*" title="String must contain at least one comma")
+            
+            .modal-footer
+              button.btn.btn-secondary(type="button" data-bs-dismiss="modal")
+                i(class="fas fa-cancel")
+              button.btn.btn-primary(type="submit")
+                i(class="fas fa-save")
+

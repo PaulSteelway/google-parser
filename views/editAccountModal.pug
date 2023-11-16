@@ -1,0 +1,39 @@
+
+block content
+  .modal.fade#editAccountModal(tabindex="-1" role="dialog" aria-labelledby="editAccountModalLabel" aria-hidden="true")
+    .modal-dialog(role="document")
+      .modal-content
+        .modal-header
+          h5.modal-title#editAccountModalLabel Edit account
+          button.btn-close(type="button" data-bs-dismiss="modal" aria-label="Close")
+        .modal-body
+          form(id="editAccountForm" action="/" method="POST" )
+            .form-group
+              label(for="username") User name
+              input.form-control(type="text", id="username", name="username", required)
+            .form-group
+              label(for="password") User password
+              input.form-control(type="password", id="password", name="password", required)
+            .form-group
+              label(for="countrySelect") Choose a country:
+              select.form-select#countrySelect(name="country_id")
+                each country in countries
+                  option(value=country.id)= country.name
+            .form-group
+              label(for="proxy_host") Proxy host
+              input.form-control(type="text", id="proxy_host", name="proxy_host")
+            .form-group
+              label(for="proxy_port") Proxy port
+              input.form-control(type="text", id="proxy_port", name="proxy_port")
+            .form-group
+              label(for="proxy_username") Proxy username
+              input.form-control(type="text", id="proxy_username", name="proxy_username")
+            .form-group
+              label(for="proxy_password") Proxy password
+              input.form-control(type="text", id="proxy_password", name="proxy_password")
+            .modal-footer
+              button.btn.btn-secondary(type="button" data-bs-dismiss="modal")
+                i(class="fas fa-cancel")
+              button.btn.btn-primary(type="submit")
+                i(class="fas fa-save")
+        

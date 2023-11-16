@@ -1,0 +1,57 @@
+extends layout.pug
+
+block content
+  h1 Countries
+
+  table.table
+    thead
+      tr
+        th(scope='col') ID
+        th(scope='col') Name
+        th(scope='col') Keywords
+        th(scope='col') Stop Words
+        th(scope='col') Logs
+        th(scope='col') Actions
+    tbody
+      each country in countries
+        tr
+          td= country.id
+          td= country.name
+          td
+            if country.keywords
+              - var keywords = country.keywords.split(',')
+              .d-flex.flex-wrap 
+              each keyword in keywords
+                  span.badge.badge-primary.text-white.bg-primary.me-2.mb-2= keyword
+                  
+            else 
+              | empty
+          td
+            if country.stop_words
+              - var stop_words = country.stop_words.split(',')
+              .d-flex.flex-wrap 
+              each keyword in stop_words
+                span.badge.badge-primary.text-white.bg-danger.me-2.mb-2= keyword
+            else 
+              | empty
+          td
+            if country.logs
+              each log in country.logs
+                a(href=log) #{log}
+                if !loop.last
+                  | ,
+            else
+              | No logs
+          td 
+            button.btn.btn-warning.me-3(type='button' data-bs-toggle='modal' data-bs-target='#editCountryModal' data-bs-value=(country.id) data-bs-json=JSON.stringify(country, null, 2)) 
+              i(class="fas fa-edit")
+            button.btn.btn-danger(type='button' data-bs-toggle='modal' data-bs-target='#deleteCountryModal' data-bs-value=(country.id)) 
+              i(class="fas fa-trash")
+
+
+  button.btn.btn-primary(type='button' data-bs-toggle='modal' data-bs-target='#addCountryModal')
+    i(class="fas fa-add")
+
+  include addCountryModal.pug
+  include editCountryModal.pug
+  include deleteCountryModal.pug
