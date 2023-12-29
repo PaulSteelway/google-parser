@@ -1,16 +1,16 @@
 const sqlite3 = require('sqlite3');
-const db = new sqlite3.Database('test.sqlite'); // Используйте ':memory:' для временной базы данных, замените на путь к файлу для постоянной базы данных
+const db = new sqlite3.Database('test.sqlite');
 db.serialize(() => {
   db.run(`
     CREATE TABLE IF NOT EXISTS countries (
       id INTEGER PRIMARY KEY,
       name TEXT,
       keywords JSON,
+      keysearches TEXT DEFAULT 'casino, game, slot, play, bet',
       stop_words JSON,
       logs JSON
     )
   `);
-
   db.run(`
     CREATE TABLE IF NOT EXISTS accounts (
       id INTEGER PRIMARY KEY,

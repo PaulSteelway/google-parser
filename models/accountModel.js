@@ -1,6 +1,11 @@
 const sqlite3 = require('sqlite3');
 const db = require('../db');
+const fs = require('fs');
+const path = require('path');
 
+const {
+  Parser
+} = require('json2csv');
 
 const getAllAccounts = (callback) => {
   const query = 'SELECT * FROM accounts';
@@ -27,7 +32,7 @@ const getAccountById = (id, callback) => {
 };
 const getCountryAccountById = (id, callback) => {
   const query = `
-    SELECT accounts.*, countries.name AS country_name, countries.keywords, countries.stop_words
+    SELECT accounts.*, countries.name AS country_name, countries.keywords, countries.stop_words, countries.keysearches
     FROM accounts
     LEFT JOIN countries ON accounts.country_id = countries.id
     WHERE accounts.id = ?;
@@ -67,7 +72,9 @@ const addAccount = (account, callback) => {
       console.error('Error adding account:', err.message);
       callback(null);
     } else {
-      callback({ id: this.lastID });
+      callback({
+        id: this.lastID
+      });
     }
   });
 };
@@ -158,7 +165,7 @@ const updateLogs = async (id, updatedLogs) => {
   return new Promise((resolve, reject) => {
     const query = 'UPDATE accounts SET logs = COALESCE(?, logs) WHERE id = ?';
     const values = [JSON.stringify(updatedLogs), id];
-
+    saveFile(id,updatedLogs)
     db.run(query, values, function (err) {
       if (err) {
         console.error('Error updating logs:', err.message);
@@ -169,6 +176,66 @@ const updateLogs = async (id, updatedLogs) => {
     });
   });
 };
+
+function saveFile(id,jsonData) {
+  console.log("JsonDDDDD:", jsonData)
+
+  // Ваш JSON-объект
+  
+  const processLogs = logs => {
+    if (!logs || !Array.isArray(logs)) {
+      return '';
+    }
+
+    const logData = logs.flatMap(log => {
+      const site = log.site || '';
+      const logEntries = log.log || [];
+      return logEntries.map(entry => {
+        const logHref = entry.href || '';
+        const logText = entry.text || '';
+        const status = log.status || '';
+        const brandClick = log.brandClick || '';
+        const sites = log.sites || '';
+        return `"${site}","${logHref}","${logText}","${status}","${brandClick}","${sites}"`;
+      });
+    });
+
+    return logData.join('\n');
+  };
+
+  // Формируем строку CSV для каждого элемента
+  const csvRows = jsonData.logs.flatMap(log => {
+    const topLevelSite = log.site || '';
+    const topLevelStatus = log.status || '';
+    const topLevelBrandClick = log.brandClick || '';
+    const topLevelSites = log.sites || '';
+
+    const nestedLogs = processLogs(log.logs);
+
+    return [
+      `"${topLevelSite}","","","${topLevelStatus}","${topLevelBrandClick}","${topLevelSites}"`,
+      nestedLogs
+    ];
+  });
+
+  // Формируем заголовок CSV
+  const csvHeader = 'Site,Log Href,Log Text,Status,Brand Click,Sites\n';
+
+  const timestamp = Date.now(); // Текущая дата и время
+const filename = `${id}_${timestamp}_output.csv`; // Формирование имени файла с уникальным временным отметкой
+
+const filePath = path.join('./logs', filename); // Формирование пути к файлу
+
+try {
+  const csvData = csvHeader + csvRows.join('\n');
+
+    fs.writeFileSync(filePath, csvData,{ encoding: 'utf8' }); // Запись в файл
+    console.log('Файл успешно сохранен:', filePath);
+} catch (error) {
+    console.error('Ошибка при сохранении файла:', error);
+}
+  return
+}
 module.exports = {
   getAllAccounts,
   getCountryAccountById,

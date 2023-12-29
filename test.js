@@ -20,7 +20,7 @@ module.exports =  async (userOptions) => {
             }
         }));
         const browser = await puppeteer.launch({
-            headless: true,
+            headless: "new",
             executablePath: process.env.path,
     
         });

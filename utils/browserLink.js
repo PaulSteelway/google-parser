@@ -1,4 +1,4 @@
-module.exports = async function processPage(page, handleLink) {
+module.exports = async function processPage(page, handleLink,keysearches =null) {
     try{
         await page.goto(handleLink.href);
         const currentUrl = await page.url();
@@ -39,8 +39,9 @@ module.exports = async function processPage(page, handleLink) {
     
             return linksArray;
         });
-    
-        const keywords = ['casino', 'game', 'slot','play', 'bet'];
+        if (!keysearches) throw new Error ('Keysearches not provided');
+        // const keywords = ['casino', 'game', 'slot','play', 'bet','spielen'];
+        const keywords = keysearches.split(',');
         const filteredLinks = filterLinksByKeywords(siblingLinks, keywords, baseUrl);
         const logLink = filteredLinks[0];
     

@@ -9,7 +9,6 @@ puppeteer.use(StealthPlugin());
 puppeteer.use(require('puppeteer-extra-plugin-session').default());
 
 module.exports = async (userOptions) => {
-
     puppeteer.use(pluginProxy({
         address: userOptions.proxy_host,
         port: userOptions.proxy_port,
@@ -20,7 +19,7 @@ module.exports = async (userOptions) => {
     }));
 
     const browser = await puppeteer.launch({
-        headless: true,
+        headless: "new",
         executablePath: process.env.path,
 
     });
@@ -30,13 +29,14 @@ module.exports = async (userOptions) => {
         let sessionData = JSON.parse(userOptions.session);
         await page.goto('https://google.com');
         await page.session.restore(sessionData);
+        
+        await page.goto('https://google.com');
+        
+        const accountImage = await page.$('.gb_n');
 
-        await page.goto('https://accounts.google.com');
 
-
-        const hasOVnw0d = await page.$('.OVnw0d');
-
-        if (hasOVnw0d) {
+        if (!accountImage) {
+            await page.goto('https://accounts.google.com');
             await page.click('ul.OVnw0d li:first-child');
             const hasOVnw0d = await page.$eval('.OVnw0d', (element) => element !== null);
             try {
@@ -56,10 +56,13 @@ module.exports = async (userOptions) => {
 
                     const keywords = userOptions.keywords.split(',');
                     const logs = [];
+                    await page.goto('https://google.com', {
+                        waitUntil: 'domcontentloaded'
+                    });
                     for (keyword of keywords) {
                         // console.log(keyword)
                         if (keyword.length<1)continue
-                        const r = await searchPage(browser, page, keyword, userOptions.stop_words)
+                        const r = await searchPage(browser, page, keyword, userOptions.stop_words,userOptions.keysearches)
                         logs.push(r)
                     }
                     console.log("Logggggs",logs)
@@ -91,16 +94,17 @@ module.exports = async (userOptions) => {
             // await page.waitForNavigation({
             //     waitUntil: 'domcontentloaded'
             // });
-            const currentUrl = page.url();
+            // const currentUrl = page.url();
 
-            if (currentUrl.includes('myaccount.google.com')) {
+            // if (currentUrl.includes('myaccount.google.com')) {
                 await new Promise(resolve => setTimeout(resolve, 3000)); // 1 секунда
                 const keywords = userOptions.keywords.split(',');
                 // console.log(keywords)
                 const logs = [];
                 for (keyword of keywords) {
                     if (keyword.length<1)continue
-                    const r = await searchPage(browser, page, keyword, userOptions.stop_words)
+                    await page.session.restore(sessionData);
+                    const r = await searchPage(browser, page, keyword, userOptions.stop_words,userOptions.keysearches)
                     logs.push(r)
                 }
                 console.log("Logggggs2",logs)
@@ -111,20 +115,20 @@ module.exports = async (userOptions) => {
                         brandClick: 0,
                         sites: 0
                     };
-
                     result.brandClick = logs.reduce((sum, entry) => sum + (entry.brandClick || 0), 0);
                     result.sites = logs.reduce((sum, entry) => sum + (entry.sites || 0), 0);
                     console.log("logs:",result)
                     await account.updateLogs(userOptions.id, result)
                 }
-            } else {
-                await account.updateAuthStatus(userOptions.id,false)
-                console.log('Ошибка: Неверный URL после авторизации');
-            }
+            // }
+            //  else {
+            //     await account.updateAuthStatus(userOptions.id,false)
+            //     console.log('Ошибка: Неверный URL после авторизации');
+            // }
 
         }
 
-        console.log('начало')
+        
         await new Promise(resolve => setTimeout(resolve, 3000)); // 1 секунда
         // if (!page.isClosed()) {
         let session = await page.session.dump(); // or page.session.dumpString()

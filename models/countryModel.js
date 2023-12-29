@@ -27,10 +27,10 @@ const getCountryById = (id, callback) => {
 
 const addCountry = (country, callback) => {
   const query = `
-    INSERT INTO countries (name, keywords, stop_words, logs) VALUES (?, ?, ?, ?)
+    INSERT INTO countries (name, keywords, stop_words, keysearches, logs) VALUES (?, ?, ?, ?)
   `;
 
-  const values = [country.name, country.keywords, country.stop_words, country.logs];
+  const values = [country.name, country.keywords, country.stop_words, country.keysearches, country.logs];
 
   db.run(query, values, function (err) {
     if (err) {
@@ -49,7 +49,8 @@ const updateCountry = (id, updatedFields, callback) => {
       name = COALESCE(?, name),
       keywords = COALESCE(?, keywords),
       stop_words = COALESCE(?, stop_words),
-      logs = COALESCE(?, logs)
+      logs = COALESCE(?, logs),
+      keysearches = COALESCE(?, keysearches)
     WHERE id = ?
   `;
 
@@ -58,6 +59,7 @@ const updateCountry = (id, updatedFields, callback) => {
     updatedFields.keywords,
     updatedFields.stop_words,
     updatedFields.logs,
+    updatedFields.keysearches,
     id,
   ];
   // console.log(values)
